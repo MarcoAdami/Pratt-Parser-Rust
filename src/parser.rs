@@ -45,7 +45,7 @@ pub fn parse_expression(lexer: &mut Lexer, min_bp: f32) -> Expression {
         }
         lexer.next();
         let rhs = parse_expression(lexer, r_bp);
-        lhs = Expression::Operation(op, vec![lhs, rhs]);
+        lhs = Expression::Operation(op, Box::new(lhs), Box::new(rhs));
     }
     lhs
 }

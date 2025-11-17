@@ -1,21 +1,20 @@
-use std::fmt;
 use crate::lexer::Lexer;
 use crate::parser::parse_expression;
+use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum Expression {
     Atom(char),
-    Operation(char, Vec<Expression>),
+    Operation(char, Box<Expression>, Box<Expression>),
 }
 impl fmt::Display for Expression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Expression::Atom(i) => write!(f, "{}", i),
-            Expression::Operation(head, rest) => {
+            Expression::Operation(head, son1, son2) => {
                 write!(f, "({}", head)?;
-                for s in rest {
-                    write!(f, " {}", s)?
-                }
+                write!(f, " {}", son1)?;
+                write!(f, " {}", son2)?;
                 write!(f, ")")
             }
         }
