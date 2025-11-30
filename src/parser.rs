@@ -1,6 +1,6 @@
-use crate::token::Token;
-use crate::lexer::Lexer;
 use crate::expression::Expression;
+use crate::lexer::Lexer;
+use crate::token::Token;
 
 fn infix_binding_power(op: char) -> (f32, f32) {
     match op {
@@ -22,7 +22,17 @@ fn infix_binding_power(op: char) -> (f32, f32) {
 pub fn parse_expression(lexer: &mut Lexer, min_bp: f32) -> Expression {
     //left hand side of the operand
     let mut lhs = match lexer.next() {
-        Token::Atom(it) => Expression::Atom(it),
+        Token::Atom(it) => {
+            let mut temp: i128 = it.to_digit(10).unwrap_or(0) as i128;
+            loop {
+                match lexer.peek() {
+                    Token::Atom(num) => temp = temp * 10 + num.to_digit(10).unwrap_or(0) as i128,
+                    _ => break,
+                };
+                lexer.next();
+            }
+            Expression::Atom(temp)
+        }
         Token::Op('(') => {
             let lhs = parse_expression(lexer, 0.0);
             assert_eq!(lexer.next(), Token::Op(')'));

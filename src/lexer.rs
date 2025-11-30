@@ -8,7 +8,7 @@ impl Lexer {
             .chars()
             .filter(|it| !it.is_ascii_whitespace())
             .map(|c| match c {
-                '0'..='9' | 'a'..='z' | 'A'..='Z' => Token::Atom(c),
+                '0'..='9' => Token::Atom(c), //| 'a'..='z' | 'A'..='Z' if you want the power to  parser letters
                 _ => Token::Op(c),
             })
             .collect::<Vec<Token>>();

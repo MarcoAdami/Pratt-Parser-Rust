@@ -1,4 +1,4 @@
-# Pratt Parser - Rust implementation
+# Algebraic Pratt Parser - Rust implementation
 
 It is a lighweight parser that enables the traslation of expression in a AST.
 
@@ -6,16 +6,16 @@ It is a lighweight parser that enables the traslation of expression in a AST.
 
 ### Done
 
-- Parser (one character tokens)
-- Expression (one character tokens)
+- Parser (multiple digit number)
+- Expression (multiple digit number)
+- Expression -> binary AST
 
 ### In progress
 
-- Parser for complex tokens
-
 ### To do
-
-- Making Expression represent more complex tokens
+- Handle error of number greater than i128
+- Handle error of incorrect input 
+- Expression -> multiple children AST
 
 # Essential Resources
 

@@ -12,7 +12,7 @@ use std::fmt;
 */
 #[derive(Debug, PartialEq)]
 pub enum Expression {
-    Atom(char),
+    Atom(i128),
     Operation(char, Box<Expression>, Box<Expression>),
 }
 //Display Expression in prefix notation
@@ -57,10 +57,10 @@ impl Expression {
     pub fn print_visual(&self) -> String {
         // The recursive printing function uses a Vector to build the output.
         let mut output = Vec::new();
-        
+
         // Start the recursion: The root is not considered a left child (false)
         self.print_recursive("", false, &mut output);
-        
+
         output.join("\n")
     }
 
@@ -75,43 +75,39 @@ impl Expression {
                 // If the CURRENT node is the left child (`is_left`), the line must continue (│)
                 // If the CURRENT node is not the left child, the line is a blank space ( )
                 right.print_recursive(
-                    &(prefix.to_owned() + if is_left { "│   " } else { "    " }), 
+                    &(prefix.to_owned() + if is_left { "│   " } else { "    " }),
                     false, // The right child is not the left child
-                    output
+                    output,
                 );
-                
+
                 // 2. Print the CURRENT node
                 // The connector is '└── ' if it is the left child, '┌── ' otherwise.
-                output.push(
-                    format!("{}{} {}", 
-                        prefix, 
-                        if is_left { "└──" } else { "┌──" }, 
-                        op
-                    )
-                );
-                
+                output.push(format!(
+                    "{}{} {}",
+                    prefix,
+                    if is_left { "└──" } else { "┌──" },
+                    op
+                ));
+
                 // 3. Print the LEFT branch (displayed at the bottom)
                 // If the CURRENT node is the left child, the line is a blank space (the parent branch ends here)
                 // If the CURRENT node is not the left child, the line must continue (│)
                 left.print_recursive(
-                    &(prefix.to_owned() + if is_left { "    " } else { "│   " }), 
+                    &(prefix.to_owned() + if is_left { "    " } else { "│   " }),
                     true, // The left child is the left child
-                    output
+                    output,
                 );
             }
-            
+
             Expression::Atom(c) => {
                 // Base Case: Print the leaf
-                output.push(
-                    format!("{}{} {}", 
-                        prefix, 
-                        if is_left { "└──" } else { "┌──" }, 
-                        c
-                    )
-                );
+                output.push(format!(
+                    "{}{} {}",
+                    prefix,
+                    if is_left { "└──" } else { "┌──" },
+                    c
+                ));
             }
         }
     }
 }
-
-

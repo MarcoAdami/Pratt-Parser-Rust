@@ -1,4 +1,4 @@
-mod token;
+pub mod expression;
 mod lexer;
 mod parser;
-pub mod expression;
+mod token;
