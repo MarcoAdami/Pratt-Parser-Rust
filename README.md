@@ -6,15 +6,17 @@ It is a lighweight parser that enables the traslation of expression in a AST.
 
 ### Done
 
-- Parser (multiple digit number)
-- Expression (multiple digit number)
+- Parser
+- Expression
 - Expression -> binary AST
+- Only handle numeric expressions (multiple digit number)
+- Handle error of incorrect input
 
 ### In progress
+ 
 
 ### To do
 - Handle error of number greater than i128
-- Handle error of incorrect input 
 - Expression -> multiple children AST
 
 # Essential Resources

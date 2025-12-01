@@ -1,3 +1,4 @@
+use crate::costum_result::MyResult;
 use crate::lexer::Lexer;
 use crate::parser::parse_expression;
 use std::fmt;
@@ -10,7 +11,7 @@ use std::fmt;
     Type of three:
     At the moment is perfectly binary, there are only binary operation.
 */
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum Expression {
     Atom(i128),
     Operation(char, Box<Expression>, Box<Expression>),
@@ -32,9 +33,9 @@ impl fmt::Display for Expression {
 
 //Parser caller
 impl Expression {
-    pub fn from_str(input: &str) -> Expression {
+    pub fn from_str(input: &str) -> MyResult {
         let mut lexer = Lexer::new(input);
-        parse_expression(&mut lexer, 0.0)
+        parse_expression(&mut lexer, 0.0, &mut (0 as u8))
     }
 }
 
