@@ -1,6 +1,6 @@
 # Algebraic Pratt Parser - Rust implementation
 
-It is a lighweight parser that enables the traslation of expression in a AST.
+It is a lighweight parser that enables the translation of expression in prefix notation.
 
 ## Project State
 
