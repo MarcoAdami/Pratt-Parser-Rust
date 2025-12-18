@@ -7,19 +7,14 @@ It is a lighweight parser that enables the traslation of expression in a AST.
 ### Done
 
 - Parser
-- Expression
-- Expression -> binary AST
 - Only handle numeric expressions (multiple digit number)
 - Handle error of incorrect input
-
+- Print Expression in infix notation
 ### In progress
 
 
 ### To do
-- Print Expression in infix notation
-- Ability to do operation between terms by id
 - Handle error of number greater than i128
-- Expression -> multiple children AST
 
 # Essential Resources
 

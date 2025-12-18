@@ -1,4 +1,3 @@
-use crate::expression::Expression;
 use crate::lexer::Lexer;
 use crate::token::Token;
 
@@ -12,62 +11,101 @@ fn infix_binding_power(op: char) -> (f32, f32) {
     }
 }
 
-/*
-   We scan the expression iterating through it,
-   but there could be some problem like the rhs operands could
-   have a stronger binding power the lhs so we have to account
-   for that iterating a recursing through it before merging it
-*/
-pub fn parse_expression(lexer: &mut Lexer, min_bp: f32, nested: &mut u8) -> Result<Expression,String> {
-    //left hand side of the operand
+pub fn parse_to_prefix(input: &str) -> Result<String, String> {
+    let mut lexer = Lexer::new(input);
+    parse_expression(&mut lexer, 0.0)
+}
+
+pub fn parse_to_prefix_with_parenthesis(input: &str) -> Result<String, String> {
+    let mut lexer = Lexer::new(input);
+    parse_expression_with_parethesis(&mut lexer, 0.0)
+}
+
+fn parse_expression(lexer: &mut Lexer, min_bp: f32) -> Result<String, String> {
+    // Parse prefix (operando sinistro)
     let mut lhs = match lexer.next() {
         Token::Atom(it) => {
-            let mut temp: i128 = it.to_digit(10).unwrap_or(0) as i128;
-            loop {
-                match lexer.peek() {
-                    Token::Atom(num) => temp = temp * 10 + num.to_digit(10).unwrap_or(0) as i128,
-                    _ => break,
-                };
+            let mut num = it.to_digit(10).unwrap() as i128;
+            while let Token::Atom(digit) = lexer.peek() {
+                num = num * 10 + digit.to_digit(10).unwrap() as i128;
                 lexer.next();
             }
-            Expression::Atom(temp)
+            num.to_string() // Stringa direttamente
         }
         Token::Op('(') => {
-            let result = parse_expression(lexer, 0.0, &mut (*nested + 1))?;
+            let result = parse_expression(lexer, 0.0)?;
             match lexer.next() {
-                Token::Op(')') =>result,
+                Token::Op(')') => result,
                 t => return Err(format!("Expected ')', got {:?}", t)),
             }
-            
         }
         t => return Err(format!("bad token: {:?}", t)),
     };
-    // println!("{}", lhs);
 
+    // Parse operatori infissi
     loop {
         let op = match lexer.peek() {
-            Token::Eof => break,
-            Token::Op(')') => {
-                // lexer.next();
-                // println!("finish");
-                break;
-            }
+            Token::Eof | Token::Op(')') => break,
             Token::Op(op) => op,
             t => return Err(format!("bad token: {:?}", t)),
         };
-        // println!("{}", op);
 
         let (l_bp, r_bp) = infix_binding_power(op);
         if l_bp < min_bp {
             break;
         }
+        
         lexer.next();
-        let rhs = match parse_expression(lexer, r_bp, nested) {
-            Ok(expr) => expr,
-            Err(msg) => return Err(msg),
-        };
-        // println!("{}", rhs);
-        lhs = Expression::Operation(op, Box::new(lhs), Box::new(rhs));
+        let rhs = parse_expression(lexer, r_bp)?;
+        
+        // Costruisci stringa prefix direttamente: "op lhs rhs"
+        lhs = format!("{} {} {}", op, lhs, rhs);
     }
+    
+    Ok(lhs)
+}
+
+
+fn parse_expression_with_parethesis(lexer: &mut Lexer, min_bp: f32) -> Result<String, String> {
+    // Parse prefix (operando sinistro)
+    let mut lhs = match lexer.next() {
+        Token::Atom(it) => {
+            let mut num = it.to_digit(10).unwrap() as i128;
+            while let Token::Atom(digit) = lexer.peek() {
+                num = num * 10 + digit.to_digit(10).unwrap() as i128;
+                lexer.next();
+            }
+            num.to_string() // Stringa direttamente
+        }
+        Token::Op('(') => {
+            let result = parse_expression_with_parethesis(lexer, 0.0)?;
+            match lexer.next() {
+                Token::Op(')') => result,
+                t => return Err(format!("Expected ')', got {:?}", t)),
+            }
+        }
+        t => return Err(format!("bad token: {:?}", t)),
+    };
+
+    // Parse operatori infissi
+    loop {
+        let op = match lexer.peek() {
+            Token::Eof | Token::Op(')') => break,
+            Token::Op(op) => op,
+            t => return Err(format!("bad token: {:?}", t)),
+        };
+
+        let (l_bp, r_bp) = infix_binding_power(op);
+        if l_bp < min_bp {
+            break;
+        }
+        
+        lexer.next();
+        let rhs = parse_expression_with_parethesis(lexer, r_bp)?;
+        
+        // Costruisci stringa prefix direttamente: "op lhs rhs"
+        lhs = format!("({} {} {})", op, lhs, rhs);
+    }
+    
     Ok(lhs)
 }

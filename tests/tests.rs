@@ -1,10 +1,10 @@
 #[cfg(test)]
 mod tests {
-    use pratt_parser::expression::Expression;
+    use pratt_parser::parser::{parse_to_prefix_with_parenthesis};
 
     // Helper function per ridurre duplicazione
     fn assert_parse_eq(input: &str, expected: &str) {
-        let expr = Expression::from_str(input);
+        let expr = parse_to_prefix_with_parenthesis(input).unwrap_or(String::new());
         println!("Input: {} -> Output: {:?}", input, expr);
         assert_eq!(format!("{}", expr), expected);
     }
