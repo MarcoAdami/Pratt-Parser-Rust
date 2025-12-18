@@ -33,6 +33,7 @@ impl fmt::Display for Expression {
 
 //Parser caller
 impl Expression {
+    //Convert the str expression in un AST
     pub fn from_str(input: &str) -> MyResult {
         let mut lexer = Lexer::new(input);
         parse_expression(&mut lexer, 0.0, &mut (0 as u8))

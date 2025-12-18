@@ -6,10 +6,9 @@ use crate::token::Token;
 fn infix_binding_power(op: char) -> (f32, f32) {
     match op {
         '=' => (0.1, 0.2),
-        '+' => (1.0, 1.1),
-        '-' => (1.2, 1.3),
+        '+'|'-' => (1.0, 1.1),
         '*' | '/' => (2.0, 2.1),
-        '^' | '√' => (3.1, 3.0),
+        '^' => (3.1, 3.0),
         _ => panic!("unknown operator: {:?}", op),
     }
 }
@@ -56,14 +55,14 @@ pub fn parse_expression(lexer: &mut Lexer, min_bp: f32, nested: &mut u8) -> MyRe
             };
         }
     };
-    println!("{}", lhs);
+    // println!("{}", lhs);
 
     loop {
         let op = match lexer.peek() {
             Token::Eof => break,
             Token::Op(')') => {
                 // lexer.next();
-                println!("finish");
+                // println!("finish");
                 break;
             }
             Token::Op(op) => op,
@@ -73,7 +72,7 @@ pub fn parse_expression(lexer: &mut Lexer, min_bp: f32, nested: &mut u8) -> MyRe
                 };
             }
         };
-        println!("{}", op);
+        // println!("{}", op);
 
         let (l_bp, r_bp) = infix_binding_power(op);
         if l_bp < min_bp {
@@ -84,7 +83,7 @@ pub fn parse_expression(lexer: &mut Lexer, min_bp: f32, nested: &mut u8) -> MyRe
             Ok(expr) => expr,
             Err(msg) => return MyResult { 0: Err(msg) },
         };
-        println!("{}", rhs);
+        // println!("{}", rhs);
         lhs = Expression::Operation(op, Box::new(lhs), Box::new(rhs));
     }
     MyResult { 0: Ok(lhs) }
