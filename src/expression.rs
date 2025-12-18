@@ -12,13 +12,16 @@ use std::fmt;
 */
 #[derive(Debug, PartialEq, Clone)]
 pub enum Expression {
+    None,
     Atom(i128),
     Operation(char, Box<Expression>, Box<Expression>),
 }
+
 //Display Expression in prefix notation
 impl fmt::Display for Expression {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
+            Expression::None=>write!(f, ""),
             Expression::Atom(i) => write!(f, "{}", i),
             Expression::Operation(head, son1, son2) => {
                 write!(f, "({}", head)?;
@@ -33,29 +36,41 @@ impl fmt::Display for Expression {
 //Parser caller
 impl Expression {
     //Convert the str expression in un AST
-    pub fn from_str(input: &str) -> Result<Expression, String> {
+    pub fn from_str(input: &str) -> Expression {
         let mut lexer = Lexer::new(input);
-        parse_expression(&mut lexer, 0.0, &mut (0 as u8))
+        match parse_expression(&mut lexer, 0.0, &mut (0 as u8)){
+            Ok(expr)=>expr,
+            Err(e)=>{
+                println!("{e}");
+                Expression::None
+            }
+        }
     }
 }
 
 //Some display methods
 impl Expression {
     pub fn print_infix(&self){
+        self.print_infix1();
+        println!("");
+    }
+    pub fn print_infix1(&self){
         match self {
+            Expression::None=>{}
             Expression::Atom(value) => {
                 print!("{}", value);
             }
             Expression::Operation(op, left, right) => {
-                left.print_infix();
+                left.print_infix1();
                 print!("{}", op);
-                right.print_infix();
-                print!("{}", op);
+                right.print_infix1();
+                // print!("{}", op);
             }
         }
     }
     pub fn printree(&self, prefix: &str, last: bool) {
         match self {
+            Expression::None=>{}
             Expression::Atom(value) => {
                 println!("{}{}{}", prefix, if last { "└── " } else { "├── " }, value);
             }
@@ -84,6 +99,7 @@ impl Expression {
     /// `is_left`: Indicates if the CURRENT node is the left child of its parent.
     fn print_recursive(&self, prefix: &str, is_left: bool, output: &mut Vec<String>) {
         match self {
+            Expression::None=>{}
             Expression::Operation(op, left, right) => {
                 // 1. Print the RIGHT branch (displayed at the top)
                 // If the CURRENT node is the left child (`is_left`), the line must continue (│)

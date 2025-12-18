@@ -4,8 +4,7 @@ mod tests {
 
     // Helper function per ridurre duplicazione
     fn assert_parse_eq(input: &str, expected: &str) {
-        let expr = Expression::from_str(input)
-        .unwrap_or_else(|e| panic!("Failed to parse '{}': {}", input, e));
+        let expr = Expression::from_str(input);
         println!("Input: {} -> Output: {:?}", input, expr);
         assert_eq!(format!("{}", expr), expected);
     }
@@ -331,7 +330,7 @@ mod tests {
 
         #[test]
         fn parse_empty_string_panics() {
-            assert_parse_eq("", "bad token: Eof");
+            assert_parse_eq("", "");
         }
 
         #[test]
