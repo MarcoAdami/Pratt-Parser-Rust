@@ -1,4 +1,3 @@
-use crate::costum_result::MyResult;
 use crate::lexer::Lexer;
 use crate::parser::parse_expression;
 use std::fmt;
@@ -34,7 +33,7 @@ impl fmt::Display for Expression {
 //Parser caller
 impl Expression {
     //Convert the str expression in un AST
-    pub fn from_str(input: &str) -> MyResult {
+    pub fn from_str(input: &str) -> Result<Expression, String> {
         let mut lexer = Lexer::new(input);
         parse_expression(&mut lexer, 0.0, &mut (0 as u8))
     }
@@ -42,6 +41,19 @@ impl Expression {
 
 //Some display methods
 impl Expression {
+    pub fn print_infix(&self){
+        match self {
+            Expression::Atom(value) => {
+                print!("{}", value);
+            }
+            Expression::Operation(op, left, right) => {
+                left.print_infix();
+                print!("{}", op);
+                right.print_infix();
+                print!("{}", op);
+            }
+        }
+    }
     pub fn printree(&self, prefix: &str, last: bool) {
         match self {
             Expression::Atom(value) => {

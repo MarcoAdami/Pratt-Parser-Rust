@@ -13,9 +13,11 @@ It is a lighweight parser that enables the traslation of expression in a AST.
 - Handle error of incorrect input
 
 ### In progress
- 
+
 
 ### To do
+- Print Expression in infix notation
+- Ability to do operation between terms by id
 - Handle error of number greater than i128
 - Expression -> multiple children AST
 

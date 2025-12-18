@@ -1,4 +1,3 @@
-use crate::costum_result::MyResult;
 use crate::expression::Expression;
 use crate::lexer::Lexer;
 use crate::token::Token;
@@ -19,10 +18,9 @@ fn infix_binding_power(op: char) -> (f32, f32) {
    have a stronger binding power the lhs so we have to account
    for that iterating a recursing through it before merging it
 */
-pub fn parse_expression(lexer: &mut Lexer, min_bp: f32, nested: &mut u8) -> MyResult {
+pub fn parse_expression(lexer: &mut Lexer, min_bp: f32, nested: &mut u8) -> Result<Expression,String> {
     //left hand side of the operand
-    let mut lhs;
-    match lexer.next() {
+    let mut lhs = match lexer.next() {
         Token::Atom(it) => {
             let mut temp: i128 = it.to_digit(10).unwrap_or(0) as i128;
             loop {
@@ -32,28 +30,17 @@ pub fn parse_expression(lexer: &mut Lexer, min_bp: f32, nested: &mut u8) -> MyRe
                 };
                 lexer.next();
             }
-            lhs = Expression::Atom(temp);
+            Expression::Atom(temp)
         }
         Token::Op('(') => {
-            let result = parse_expression(lexer, 0.0, &mut (*nested + 1));
-            match &result.0 {
-                Ok(expr) => lhs = expr.clone(),
-                Err(msg) => {
-                    return MyResult {
-                        0: Err(format!("{}", msg)),
-                    };
-                }
-            };
+            let result = parse_expression(lexer, 0.0, &mut (*nested + 1))?;
             match lexer.next() {
-                Token::Op(')') => {}
-                t => return MyResult(Err(format!("Expected ')', got {:?}", t))),
+                Token::Op(')') =>result,
+                t => return Err(format!("Expected ')', got {:?}", t)),
             }
+            
         }
-        t => {
-            return MyResult {
-                0: Err(format!("bad token: {:?}", t)),
-            };
-        }
+        t => return Err(format!("bad token: {:?}", t)),
     };
     // println!("{}", lhs);
 
@@ -66,11 +53,7 @@ pub fn parse_expression(lexer: &mut Lexer, min_bp: f32, nested: &mut u8) -> MyRe
                 break;
             }
             Token::Op(op) => op,
-            t => {
-                return MyResult {
-                    0: Err(format!("bad token: {:?}", t)),
-                };
-            }
+            t => return Err(format!("bad token: {:?}", t)),
         };
         // println!("{}", op);
 
@@ -79,12 +62,12 @@ pub fn parse_expression(lexer: &mut Lexer, min_bp: f32, nested: &mut u8) -> MyRe
             break;
         }
         lexer.next();
-        let rhs = match parse_expression(lexer, r_bp, nested).0 {
+        let rhs = match parse_expression(lexer, r_bp, nested) {
             Ok(expr) => expr,
-            Err(msg) => return MyResult { 0: Err(msg) },
+            Err(msg) => return Err(msg),
         };
         // println!("{}", rhs);
         lhs = Expression::Operation(op, Box::new(lhs), Box::new(rhs));
     }
-    MyResult { 0: Ok(lhs) }
+    Ok(lhs)
 }
