@@ -3,7 +3,7 @@ pub(crate) struct Lexer {
     tokens: Vec<Token>,
 }
 impl Lexer {
-    pub(crate) fn new(input: &str) -> Lexer {
+    pub(crate) fn new(input: String) -> Lexer {
         let mut tokens = input
             .chars()
             .filter(|it| !it.is_ascii_whitespace())

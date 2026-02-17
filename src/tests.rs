@@ -1,10 +1,9 @@
 #[cfg(test)]
 mod tests {
-    use pratt_parser::parser::{parse_to_prefix_with_parenthesis};
-
+    use crate::api::*;
     // Helper function per ridurre duplicazione
     fn assert_parse_eq(input: &str, expected: &str) {
-        let expr = parse_to_prefix_with_parenthesis(input).unwrap_or(String::new());
+        let expr = convert_str_to_ast(input.to_string());
         println!("Input: {} -> Output: {:?}", input, expr);
         assert_eq!(format!("{}", expr), expected);
     }
@@ -330,7 +329,7 @@ mod tests {
 
         #[test]
         fn parse_empty_string_panics() {
-            assert_parse_eq("", "");
+            assert_parse_eq("", "bad token: Eof");
         }
 
         #[test]
