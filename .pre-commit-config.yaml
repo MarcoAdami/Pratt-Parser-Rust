@@ -1,0 +1,8 @@
+repos:
+  - repo: local
+    hooks:
+      - id: rust-check
+        name: "Controllo qualità Rust (just check)"
+        entry: just check
+        language: system
+        pass_filenames: false

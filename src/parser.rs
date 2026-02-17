@@ -1,18 +1,21 @@
+use crate::expression::Expression;
 use crate::lexer::Lexer;
 use crate::token::Token;
-use crate::expression::Expression;
 
 fn infix_binding_power(op: char) -> (f32, f32) {
     match op {
         '=' => (0.1, 0.2),
-        '+'|'-' => (1.0, 1.1),
+        '+' | '-' => (1.0, 1.1),
         '*' | '/' => (2.0, 2.1),
         '^' => (3.1, 3.0),
         _ => panic!("unknown operator: {:?}", op),
     }
 }
 
-pub(crate)fn parse_expression_with_parethesis(lexer: &mut Lexer, min_bp: f32) -> Result<Expression, String> {
+pub(crate) fn parse_expression_with_parethesis(
+    lexer: &mut Lexer,
+    min_bp: f32,
+) -> Result<Expression, String> {
     // Parse prefix (operando sinistro)
     let mut lhs = match lexer.next() {
         Token::Atom(it) => {
@@ -25,9 +28,9 @@ pub(crate)fn parse_expression_with_parethesis(lexer: &mut Lexer, min_bp: f32) ->
         }
         Token::Op('(') => {
             let result = parse_expression_with_parethesis(lexer, 0.0)?;
-            let next_token=lexer.next();
+            let next_token = lexer.next();
             // CHECK at the end of the expression there should be the closing prarenthesis that has been opened
-            if  next_token!= Token::Op(')') {
+            if next_token != Token::Op(')') {
                 return Err(format!("Expected ')', got {:?}", next_token));
             }
             result
@@ -47,13 +50,13 @@ pub(crate)fn parse_expression_with_parethesis(lexer: &mut Lexer, min_bp: f32) ->
         if l_bp < min_bp {
             break;
         }
-        
+
         lexer.next();
         let rhs = parse_expression_with_parethesis(lexer, r_bp)?;
-        
+
         // Costruisci stringa prefix direttamente: "op lhs rhs"
         lhs = Expression::Operation(op, Box::new(lhs), Box::new(rhs));
     }
-    
+
     Ok(lhs)
 }
